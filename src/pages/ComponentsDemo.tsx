@@ -9,6 +9,7 @@ interface ComponentDemoProps {
 }
 
 const ComponentDemo = ({ children, code }: ComponentDemoProps) => {
+  
   const [isCodeVisible, setIsCodeVisible] = useState(false);
 
   return (
@@ -24,7 +25,9 @@ const ComponentDemo = ({ children, code }: ComponentDemoProps) => {
         </button>
       </div>
 
-      <div className="py-20 px-4 flex items-center justify-center">{children}</div>
+      <div className="py-20 px-4 flex items-center justify-center">
+        {children}
+      </div>
 
       {isCodeVisible && (
         <div className="border-t border-gray-200">

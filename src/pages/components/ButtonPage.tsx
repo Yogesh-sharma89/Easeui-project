@@ -4,6 +4,7 @@ import ComponentDemo from "../ComponentsDemo";
 import PropsTable from "@/components/Personal/PropsTable";
 
 const ButtonPage = () => {
+  
   const basicUsageCode = `
 import { Button } from "@/components/Button/Button"
 

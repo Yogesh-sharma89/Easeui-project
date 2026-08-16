@@ -5,9 +5,12 @@ import { Menu } from "lucide-react";
 type Props = {};
 
 const ComponentLayout = ({}: Props) => {
+
   const location = useLocation();
   console.log(location);
+
   const navigate = useNavigate();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const components = [
@@ -51,10 +54,13 @@ const ComponentLayout = ({}: Props) => {
         </ul>
       </aside>
 
-      <div className="flex-1 ml-10 overflow-auto h-screen p-6">
+      <div className="flex-1 z-50 ml-10 overflow-auto h-screen p-6">
         <button
-          className="md:hidden mb-4 text-gray-700"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden cursor-pointer mb-4 text-gray-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            setSidebarOpen(!sidebarOpen);
+          }}
         >
           <Menu size={24} />
         </button>
