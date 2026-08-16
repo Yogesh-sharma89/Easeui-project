@@ -2,7 +2,7 @@
   "name": "dev-ease-ui",
   "version": "1.0.6",
   "description": "A modern React UI library by Devendra Dhote",
-  "author": "Devendra Dhote",
+  "author": "Yogesh Sharma",
   "license": "MIT",
   "main": "dist/easeui.umd.js",
   "module": "dist/easeui.es.js",
