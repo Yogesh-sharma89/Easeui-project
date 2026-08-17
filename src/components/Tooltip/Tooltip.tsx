@@ -6,6 +6,7 @@ import { cn } from "@/libs/utils";
 const tooltipContentVariants = cva(
   `
     z-50
+    max-w-[calc(100vw-2rem)]
     overflow-hidden
     rounded-lg
     border
@@ -13,13 +14,9 @@ const tooltipContentVariants = cva(
     py-2
     text-xs
     font-medium
-    shadow-xl
+    shadow-lg
     backdrop-blur-md
     select-none
-
-    border-slate-700/70
-    bg-slate-900/95
-    text-slate-100
 
     origin-[var(--radix-tooltip-content-transform-origin)]
 
@@ -27,46 +24,46 @@ const tooltipContentVariants = cva(
     data-[state=closed]:fade-out-0
     data-[state=closed]:zoom-out-95
 
+    data-[state=open]:animate-in
+    data-[state=open]:fade-in-0
+    data-[state=open]:zoom-in-95
+
     data-[side=bottom]:slide-in-from-top-1
     data-[side=left]:slide-in-from-right-1
     data-[side=right]:slide-in-from-left-1
     data-[side=top]:slide-in-from-bottom-1
-
-    data-[state=open]:animate-in
-    data-[state=open]:fade-in-0
-    data-[state=open]:zoom-in-95
   `,
   {
     variants: {
       variant: {
         default: `
-          border-slate-700/70
-          bg-slate-900/95
-          text-slate-100
+          border-(--border-color)
+          bg-(--surface-color)
+          text-(--text-color)
         `,
 
         primary: `
-          border-indigo-400/20
-          bg-indigo-600
+          border-(--primary-color)
+          bg-(--primary-color)
           text-white
         `,
 
         success: `
-          border-green-400/20
-          bg-green-600
+          border-(--success-color)
+          bg-(--success-color)
           text-white
         `,
 
         destructive: `
-          border-red-400/20
-          bg-red-600
+          border-(--danger-color)
+          bg-(--danger-color)
           text-white
         `,
 
         warning: `
-          border-yellow-400/20
-          bg-yellow-500
-          text-slate-950
+          border-(--warning-color)
+          bg-(--warning-color)
+          text-(--text-color)
         `,
       },
 
@@ -81,52 +78,53 @@ const tooltipContentVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface TooltipProps
   extends VariantProps<typeof tooltipContentVariants> {
-
+  /** Tooltip content. JSX is supported for rich content. */
   content: React.ReactNode;
 
-  /** Element which triggers the tooltip.*/
+  /** Element which triggers the tooltip. */
   children: React.ReactElement;
 
-  /**
-   * Position of the tooltip relative to the trigger.
-   */
   side?: "top" | "bottom" | "left" | "right";
 
-  /**
-   * Alignment relative to the trigger.
-   */
   align?: "start" | "center" | "end";
 
-  /**
-   * Distance between tooltip and trigger.
-   */
   sideOffset?: number;
 
-  /**
-   * Delay before tooltip appears.
-   */
+  alignOffset?: number;
+
+  collisionPadding?: number | Partial<{
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  }>;
+
+  arrowPadding?: number;
+
+  sticky?: "partial" | "always";
+
+  hideWhenDetached?: boolean;
+
+  avoidCollisions?: boolean;
+
   delayDuration?: number;
 
-  /**
-   * Disable tooltip completely.
-   */
   disabled?: boolean;
 
-  /**
-   * Additional class names for tooltip content.
-   */
-  className?: string;
+  open?: boolean;
 
-  /**
-   * Whether the tooltip should avoid overlapping
-   * the trigger.
-   */
-  avoidCollisions?: boolean;
+  defaultOpen?: boolean;
+
+  onOpenChange?: (open: boolean) => void;
+
+  disableHoverableContent?: boolean;
+
+  className?: string;
 }
 
 const Tooltip = ({
@@ -135,23 +133,34 @@ const Tooltip = ({
   side = "top",
   align = "center",
   sideOffset = 6,
+  alignOffset = 0,
+  collisionPadding = 8,
+  arrowPadding = 4,
+  sticky = "partial",
+  hideWhenDetached = false,
+  avoidCollisions = true,
   delayDuration = 300,
   disabled = false,
-  avoidCollisions = true,
+  open,
+  defaultOpen,
+  onOpenChange,
+  disableHoverableContent = false,
   variant,
   size,
   className,
 }: TooltipProps) => {
-  /**
-   * When disabled, simply render the children.
-   * This avoids unnecessary tooltip logic.
-   */
   if (disabled) {
     return children;
   }
 
   return (
-    <TooltipPrimitive.Root delayDuration={delayDuration}>
+    <TooltipPrimitive.Root
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      delayDuration={delayDuration}
+      disableHoverableContent={disableHoverableContent}
+    >
       <TooltipPrimitive.Trigger asChild>
         {children}
       </TooltipPrimitive.Trigger>
@@ -161,21 +170,36 @@ const Tooltip = ({
           side={side}
           align={align}
           sideOffset={sideOffset}
+          alignOffset={alignOffset}
           avoidCollisions={avoidCollisions}
+          collisionPadding={collisionPadding}
+          arrowPadding={arrowPadding}
+          sticky={sticky}
+          hideWhenDetached={hideWhenDetached}
           className={cn(
             tooltipContentVariants({
               variant,
               size,
             }),
-            className
+            className,
           )}
         >
           {content}
 
           <TooltipPrimitive.Arrow
-            className="fill-slate-900"
             width={10}
             height={5}
+            className={
+              variant === "primary"
+                ? "fill-(--primary-color)"
+                : variant === "success"
+                  ? "fill-(--success-color)"
+                  : variant === "destructive"
+                    ? "fill-(--danger-color)"
+                    : variant === "warning"
+                      ? "fill-(--warning-color)"
+                      : "fill-(--surface-color)"
+            }
           />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
@@ -185,24 +209,24 @@ const Tooltip = ({
 
 Tooltip.displayName = "Tooltip";
 
-/**
- * Provider
- *
- * Add this once near the root of your application.
- */
+interface TooltipProviderProps {
+  children: React.ReactNode;
+  delayDuration?: number;
+  skipDelayDuration?: number;
+  disableHoverableContent?: boolean;
+}
+
 const TooltipProvider = ({
   children,
   delayDuration = 300,
   skipDelayDuration = 300,
-}: {
-  children: React.ReactNode;
-  delayDuration?: number;
-  skipDelayDuration?: number;
-}) => {
+  disableHoverableContent = false,
+}: TooltipProviderProps) => {
   return (
     <TooltipPrimitive.Provider
       delayDuration={delayDuration}
       skipDelayDuration={skipDelayDuration}
+      disableHoverableContent={disableHoverableContent}
     >
       {children}
     </TooltipPrimitive.Provider>
@@ -211,4 +235,8 @@ const TooltipProvider = ({
 
 TooltipProvider.displayName = "TooltipProvider";
 
-export { Tooltip, TooltipProvider, tooltipContentVariants };
+export {
+  Tooltip,
+  TooltipProvider,
+  tooltipContentVariants,
+};

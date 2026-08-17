@@ -7,9 +7,10 @@ import CardPage from "@/pages/components/CardPage";
 import ModalPage from "@/pages/components/ModalPage";
 import InputPage from "@/pages/components/InputPage";
 import NavbarPage from "@/pages/components/NavbarPage";
-import  TooltipPage  from "@/pages/components/TooltipPage";
 import CarouselPage from "@/pages/Carousel/CarouselPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import TooltipPage from "@/pages/components/TooltipPage";
+
 
 type Props = {};
 
