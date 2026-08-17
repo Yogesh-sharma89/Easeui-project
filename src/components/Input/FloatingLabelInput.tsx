@@ -14,11 +14,13 @@ const inputCls = cva(
       },
     },
     defaultVariants: { size: "md" },
-  }
+  },
 );
 
-export interface FloatingLabelProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface FloatingLabelProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size"
+> {
   label: string;
   size?: "sm" | "md" | "lg";
 }
@@ -48,7 +50,7 @@ export const FloatingLabelInput = React.forwardRef<
       <label
         className={cn(
           "absolute left-0 top-2 origin-left text-gray-500 pointer-events-none transform transition-all",
-          shrink ? "-translate-y-4 scale-75" : "translate-y-0 scale-100"
+          shrink ? "-translate-y-4 scale-75" : "translate-y-0 scale-100",
         )}
       >
         {label}
